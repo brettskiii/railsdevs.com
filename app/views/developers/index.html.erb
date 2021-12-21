@@ -4,28 +4,36 @@
 
 <div class="max-w-5xl mx-auto">
   <div class="pb-5 px-4 lg:px-0 mt-12 sm:mt-24 sm:flex sm:items-center">
-    <h3 class="text-lg leading-6 font-medium text-gray-900">
+    <h1 class="text-lg leading-6 font-medium text-gray-900">
       <%= t(".ror_developers") %>
-    </h3>
+    </h1>
+
+    <div class="mt-3 sm:mt-0 sm:ml-auto">
+      <% if @query.available_only? %>
+        <%= link_to "Show all developers", developers_path %>
+      <% else %>
+        <%= link_to "Show available developers", developers_path(available: true) %>
+      <% end %>
+    </div>
   </div>
 
   <div id="developers" class="space-y-8">
-    <%= render DeveloperCardComponent.with_collection(@developers) %>
+    <%= render DeveloperCardComponent.with_collection(@query.records) %>
   </div>
 
   <div class="mt-8">
     <%= pagy_links do %>
-      <%== pagy_nav @pagy %>
+      <%== pagy_nav @query.pagy %>
     <% end %>
   </div>
 
-  <%= turbo_frame_tag "developers-#{@pagy.page}" do %>
+  <%= turbo_frame_tag "developers-#{@query.pagy.page}" do %>
     <%= turbo_stream.append "developers" do %>
-      <% unless @pagy.page == 1 %>
-        <%= render DeveloperCardComponent.with_collection(@developers) %>
+      <% unless @query.pagy.page == 1 %>
+        <%= render DeveloperCardComponent.with_collection(@query.records) %>
       <% end %>
-      <% if @pagy.next %>
-        <%= turbo_frame_tag "developers-#{@pagy.page + 1}", src: [:developers, page: @pagy.next], loading: :lazy %>
+      <% if @query.pagy.next %>
+        <%= turbo_frame_tag "developers-#{@query.pagy.page + 1}", src: [:developers, page: @query.pagy.next], loading: :lazy %>
       <% end %>
     <% end %>
   <% end %>
